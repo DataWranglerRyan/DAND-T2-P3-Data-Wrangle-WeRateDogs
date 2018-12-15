@@ -1,0 +1,5 @@
+config/secrets.yaml
+.DS_store
+.idea/
+notebooks/.ipynb_checkpoints
+models/__pycache__/
