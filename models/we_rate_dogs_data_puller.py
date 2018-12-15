@@ -1,6 +1,5 @@
 import pandas as pd
 import requests, io
-import time
 import tweepy
 import yaml
 from models.tweet import Tweet
