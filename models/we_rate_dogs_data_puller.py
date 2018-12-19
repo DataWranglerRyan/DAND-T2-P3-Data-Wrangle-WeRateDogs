@@ -1,5 +1,6 @@
 import pandas as pd
 import requests, io
+import json
 import tweepy
 import yaml
 from models.tweet import Tweet
@@ -48,8 +49,26 @@ class WeRateDogsDataPuller(object):
             print(index)
         print(self.tweets_with_404)
 
+    def get_twitter_data_as_df(self):
+        try:
+            with open(self.twitter_data_filename) as f:
+                return pd.DataFrame([json.loads(row) for row in f])[['id','retweet_count', 'favorite_count']]
+            f.close()
+        except FileNotFoundError as e:
+            print('May need to run write_twitter_data_to_file() to pull data from API.')
+            raise e
+
+    def export_combined_data(self):
+        pd.merge(self.archive_data, self.get_twitter_data_as_df(), left_on='tweet_id', right_on='id').to_csv(
+            '../data/combined_data.csv')
+
+    def get_combined_data(self):
+        return pd.merge(self.archive_data, self.get_twitter_data_as_df(), left_on='tweet_id', right_on='id')
+
+
 wrd = WeRateDogsDataPuller()
-print(wrd.get_archive_data().head())
-print(wrd.get_image_data().head())
-print(wrd.get_secrets())
+# print(wrd.get_twitter_data_as_df())
+print(wrd.get_combined_data())
+# print(wrd.get_archive_data().head())
+# print(wrd.get_image_data().head())
 # wrd.write_twitter_data_to_file()
