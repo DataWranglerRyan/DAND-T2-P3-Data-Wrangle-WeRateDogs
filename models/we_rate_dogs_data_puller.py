@@ -58,17 +58,10 @@ class WeRateDogsDataPuller(object):
             print('May need to run write_twitter_data_to_file() to pull data from API.')
             raise e
 
-    def export_combined_data(self):
-        pd.merge(self.archive_data, self.get_twitter_data_as_df(), left_on='tweet_id', right_on='id').to_csv(
-            '../data/combined_data.csv')
-
     def get_combined_data(self):
-        return pd.merge(self.archive_data, self.get_twitter_data_as_df(), left_on='tweet_id', right_on='id')
+        archive_and_twitter = pd.merge(self.archive_data, self.get_twitter_data_as_df(),
+                                       how='left', left_on='tweet_id', right_on='id')
+        return pd.merge(archive_and_twitter, self.images_df, how='left',  on='tweet_id')
 
-
-wrd = WeRateDogsDataPuller()
-# print(wrd.get_twitter_data_as_df())
-print(wrd.get_combined_data())
-# print(wrd.get_archive_data().head())
-# print(wrd.get_image_data().head())
-# wrd.write_twitter_data_to_file()
+    def export_combined_data(self):
+        self.get_combined_data().to_csv('../data/combined_data.csv')
